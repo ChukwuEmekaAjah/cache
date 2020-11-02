@@ -10,13 +10,14 @@ import (
 
 func main() {
 	arguments := os.Args
-	if len(arguments) == 1 {
-		fmt.Println("Please provide host:port.")
-		return
+
+	defaultServerAddress := "localhost:1996"
+
+	if len(os.Args) > 1 {
+		defaultServerAddress = arguments[1]
 	}
 
-	CONNECT := arguments[1]
-	c, err := net.Dial("tcp", CONNECT)
+	c, err := net.Dial("tcp", defaultServerAddress)
 	if err != nil {
 		fmt.Println(err)
 		return

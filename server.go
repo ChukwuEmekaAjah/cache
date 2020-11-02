@@ -20,13 +20,14 @@ var values = map[string]insertion{}
 
 func main() {
 	arguments := os.Args
-	if len(arguments) == 1 {
-		fmt.Println("Please provide port number")
-		return
+
+	portAddress := ":1996"
+
+	if len(arguments) > 1 {
+		portAddress = ":" + arguments[1]
 	}
 
-	PORT := ":" + arguments[1]
-	l, err := net.Listen("tcp", PORT)
+	l, err := net.Listen("tcp", portAddress)
 	if err != nil {
 		fmt.Println(err)
 		return
