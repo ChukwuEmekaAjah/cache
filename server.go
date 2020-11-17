@@ -16,7 +16,9 @@ type insertion struct {
 	values []string
 }
 
-var values = map[string]insertion{}
+var cacheMap = make(map[string]*cacheparser.KeyValue)
+
+// var values = map[string]insertion{}
 
 func main() {
 	arguments := os.Args
@@ -62,9 +64,36 @@ func tcpHandler(c net.Conn) {
 		if !isValidCommand {
 			c.Write([]byte("Invalid command sent"))
 		}
+
+		commandParts := strings.Fields(strings.TrimSpace(netData))
+
+		commandAction, exists := cacheparser.ParserFunctions[strings.ToUpper(commandParts[0])]
+		retrievalAction, ok := cacheparser.RetrievalFunctions[strings.ToUpper(commandParts[0])]
+
+		if exists == false && ok == false {
+			c.Write([]byte("Invalid command sent 2"))
+		}
+
+		if exists {
+			parsedValue := commandAction(strings.ToUpper(commandParts[0]), commandParts[1:], "single")
+
+			cacheMap[commandParts[1]] = parsedValue
+		}
+
+		// retrieval function
+		if ok {
+			parsedValue, err := retrievalAction(commandParts[0], commandParts[1:], cacheMap)
+
+			if err != nil {
+				c.Write([]byte("Invalid command sent 3"))
+			}
+
+			c.Write([]byte(parsedValue))
+		}
+
 		fmt.Print("-> ", string(netData))
 		t := time.Now()
-		myTime := t.Format(time.RFC3339) + "\n"
+		myTime := "\n" + t.Format(time.RFC3339) + "\n"
 		c.Write([]byte(myTime))
 	}
 }
