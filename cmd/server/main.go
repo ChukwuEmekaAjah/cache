@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChukwuEmekaAjah/cache"
+	"github.com/ChukwuEmekaAjah/cache/internal/parser"
 )
 
 type insertion struct {
@@ -16,7 +16,7 @@ type insertion struct {
 	values []string
 }
 
-var cacheMap = make(map[string]*cache.KeyValue)
+var cacheMap = make(map[string]*parser.KeyValue)
 
 // var values = map[string]insertion{}
 
@@ -59,7 +59,7 @@ func tcpHandler(c net.Conn) {
 			return
 		}
 
-		isValidCommand := cache.Parse(strings.TrimSpace(netData))
+		isValidCommand := parser.Parse(strings.TrimSpace(netData))
 		fmt.Println("command is ", string(netData), isValidCommand)
 		if !isValidCommand {
 			c.Write([]byte("Invalid command sent"))
@@ -67,8 +67,8 @@ func tcpHandler(c net.Conn) {
 
 		commandParts := strings.Fields(strings.TrimSpace(netData))
 
-		commandAction, exists := cache.ParserFunctions[strings.ToUpper(commandParts[0])]
-		retrievalAction, ok := cache.RetrievalFunctions[strings.ToUpper(commandParts[0])]
+		commandAction, exists := parser.ParserFunctions[strings.ToUpper(commandParts[0])]
+		retrievalAction, ok := parser.RetrievalFunctions[strings.ToUpper(commandParts[0])]
 
 		if exists == false && ok == false {
 			c.Write([]byte("Invalid command sent 2"))
