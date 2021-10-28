@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ChukwuEmekaAjah/cache"
 	"github.com/ChukwuEmekaAjah/cache/internal/parser"
 )
 
@@ -21,6 +22,7 @@ var cacheMap = make(map[string]*parser.KeyValue)
 // var values = map[string]insertion{}
 
 func main() {
+	cache.Config()
 	arguments := os.Args
 
 	portAddress := ":1996"

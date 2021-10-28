@@ -188,7 +188,7 @@ func retrieveKeysFunction(commandName string, arguments []string, cacheMap map[s
 	keys := ""
 
 	for k := range cacheMap {
-		keys += fmt.Sprintf("%s\n", k)
+		keys += fmt.Sprintf("%s\t", k)
 	}
 
 	return keys, nil
