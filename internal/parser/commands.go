@@ -3,19 +3,11 @@ package parser
 import "strconv"
 
 func isValidSetCommand(command string, arguments []string) bool {
-	if len(arguments) < 2 {
-		return false
-	}
-
-	return true
+	return len(arguments) >= 2
 }
 
 func isValidGetCommand(command string, arguments []string) bool {
-	if len(arguments) < 1 {
-		return false
-	}
-
-	return true
+	return len(arguments) == 1
 }
 
 func isValidSetexCommand(command string, arguments []string) bool {
@@ -211,10 +203,7 @@ func isValidZcardCommand(command string, arguments []string) bool {
 }
 
 func isValidExistsCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) >= 1
 }
 
 func isValidKeysCommand(command string, arguments []string) bool {

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // KeyValue represents how we would store values internally
@@ -137,21 +138,29 @@ var ParserFunctions = map[string]func(command string, arguments []string, cacheM
 func retrieveGetFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
 	keyValue, exists := cacheMap[arguments[0]]
 
-	if exists == false {
-		return "", errors.New("Unable to find value")
+	if !exists {
+		return "", errors.New("unable to find value")
 	}
 
-	return keyValue.value[0], nil
+	return strings.Join(keyValue.value, " "), nil
 }
 
 func retrieveExistsFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
-	_, exists := cacheMap[arguments[0]]
+	noOfKeysPresentCount := 0
 
-	if exists == false {
-		return "", errors.New("Unable to find key")
+	for _, arg := range arguments {
+		_, exists := cacheMap[arg]
+	
+		if exists {
+			noOfKeysPresentCount++
+		}
 	}
 
-	return "1", nil
+	if noOfKeysPresentCount == 0 {
+		return "0", errors.New("unable to find key")
+	}
+	
+	return strconv.Itoa(noOfKeysPresentCount), nil
 }
 
 func retrieveHlenFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {

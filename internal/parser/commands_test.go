@@ -51,3 +51,42 @@ func TestSetexCommandInvalidExpiryTime(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetCommandPresence(t *testing.T) {
+	_, commandExists := Commands["GET"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+}
+
+func TestGetCommandValidity(t *testing.T) {
+	command := "get"
+	commandArgs := []string{"fine boy"}
+
+	if !isValidGetCommand(command, commandArgs) {
+		t.Log("Command should have only an argument")
+		t.Fail()
+	}
+}
+
+func TestExistsCommandPresence(t *testing.T) {
+	_, commandExists := Commands["EXISTS"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+}
+
+func TestExistsValidity(t *testing.T) {
+	command := "exists"
+	commandArgs := []string{"ajah"}
+
+	if !isValidExistsCommand(command, commandArgs) {
+		t.Log("Command should have at least an argument")
+		t.Fail()
+	}
+
+}
