@@ -112,3 +112,23 @@ func TestExistsCommandParser(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestHKeysCommandParser(t *testing.T) {
+	command := []string{"hset mentor name ajah", "hset mentor age 24"}
+
+	for _, v := range command {
+		commandParts := strings.Fields(v)
+		parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+		cacheMap[commandParts[1]] = parsedValue
+	}
+
+	comm := "hkeys mentor"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return name and age for mentor")
+		t.Fail()
+	}
+}
