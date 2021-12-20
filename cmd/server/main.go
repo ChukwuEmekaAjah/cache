@@ -50,6 +50,7 @@ func main() {
 
 func tcpHandler(c net.Conn) {
 
+	defer c.Close()
 	for {
 		netData, err := bufio.NewReader(c).ReadString('\n')
 		if err != nil {
@@ -58,6 +59,12 @@ func tcpHandler(c net.Conn) {
 		}
 		if strings.ToUpper(strings.TrimSpace(string(netData))) == "STOP" {
 			fmt.Println("Exiting TCP server!")
+			return
+		}
+
+		if strings.TrimSpace(netData) == "" {
+			fmt.Println("Closing TCP server!")
+			c.Close()
 			return
 		}
 
