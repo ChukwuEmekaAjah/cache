@@ -35,14 +35,22 @@ func parseHSetFunction(command string, arguments []string, cacheMap map[string]*
 		return keyValueObject
 	}
 
-	for _, newValue := range arguments[1:] {
-		for _, value := range keyValueObject.value {
-			if value == newValue { // value already in the set
-				continue
-			}
-		}
-		keyValueObject.value = append(keyValueObject.value, newValue)
+	// convert to map
+	keyValueMap := make(map[string]string)
+	for i := 0; i < len(keyValueObject.value); i += 2 {
+		keyValueMap[keyValueObject.value[i]] = keyValueObject.value[i+1]
 	}
+
+	// update the map and overwrite existing keys with their respective values
+	keyValueMap[arguments[1]] = arguments[2]
+
+	flat := []string{}
+    for key, value := range keyValueMap {
+        flat = append(flat, key)
+        flat = append(flat, value)
+    }
+
+	keyValueObject.value = flat
 
 	return keyValueObject
 }
