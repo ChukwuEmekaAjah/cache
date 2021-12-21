@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // KeyValue represents how we would store values internally
@@ -18,6 +19,38 @@ func parseSetFunction(command string, arguments []string, cacheMap map[string]*K
 	keyValueObject.key = arguments[0]
 	keyValueObject.value = arguments[1:]
 	keyValueObject.command = command
+
+	return keyValueObject
+}
+
+func parseHSetFunction(command string, arguments []string, cacheMap map[string]*KeyValue) *KeyValue {
+	keyValueObject, exists := cacheMap[arguments[0]]
+
+	if !exists {
+		keyValueObject := new(KeyValue)
+		keyValueObject.key = arguments[0]
+		keyValueObject.value = arguments[1:]
+		keyValueObject.command = command
+	
+		return keyValueObject
+	}
+
+	// convert to map
+	keyValueMap := make(map[string]string)
+	for i := 0; i < len(keyValueObject.value); i += 2 {
+		keyValueMap[keyValueObject.value[i]] = keyValueObject.value[i+1]
+	}
+
+	// update the map and overwrite existing keys with their respective values
+	keyValueMap[arguments[1]] = arguments[2]
+
+	flat := []string{}
+    for key, value := range keyValueMap {
+        flat = append(flat, key)
+        flat = append(flat, value)
+    }
+
+	keyValueObject.value = flat
 
 	return keyValueObject
 }
@@ -127,7 +160,7 @@ var ParserFunctions = map[string]func(command string, arguments []string, cacheM
 	"SETEX": parseSetFunction,
 	"SETNX": parseSetFunction,
 	"ZADD":  parseZaddFunction,
-	"HSET":  parseSetFunction,
+	"HSET":  parseHSetFunction,
 	"LSET":  parseLsetFunction,
 	"LPUSH": parseLpushFunction,
 	"MSET":  parseSetFunction,
@@ -137,28 +170,53 @@ var ParserFunctions = map[string]func(command string, arguments []string, cacheM
 func retrieveGetFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
 	keyValue, exists := cacheMap[arguments[0]]
 
-	if exists == false {
-		return "", errors.New("Unable to find value")
+	if !exists {
+		return "", errors.New("unable to find value")
 	}
 
-	return keyValue.value[0], nil
+	return strings.Join(keyValue.value, " "), nil
+}
+
+func retrieveHGetFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	keyValue, exists := cacheMap[arguments[0]]
+
+	if !exists {
+		return "", errors.New("unable to find value")
+	}
+
+	var ans string
+
+	for i, value := range keyValue.value {
+		if value == arguments[1] {
+			ans = keyValue.value[i+1]
+		}
+	}
+	return ans, nil
 }
 
 func retrieveExistsFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
-	_, exists := cacheMap[arguments[0]]
+	noOfKeysPresentCount := 0
 
-	if exists == false {
-		return "", errors.New("Unable to find key")
+	for _, arg := range arguments {
+		_, exists := cacheMap[arg]
+	
+		if exists {
+			noOfKeysPresentCount++
+		}
 	}
 
-	return "1", nil
+	if noOfKeysPresentCount == 0 {
+		return "0", errors.New("unable to find key")
+	}
+	
+	return strconv.Itoa(noOfKeysPresentCount), nil
 }
 
 func retrieveHlenFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
 	value, exists := cacheMap[arguments[0]]
 
-	if exists == false {
-		return "", errors.New("Unable to find key")
+	if !exists {
+		return "", errors.New("unable to find key")
 	}
 
 	return fmt.Sprint(len(value.value) / 2), nil
@@ -194,11 +252,30 @@ func retrieveKeysFunction(commandName string, arguments []string, cacheMap map[s
 	return keys, nil
 }
 
+func retrieveHKeysFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	keys := ""
+	keyValue, exists := cacheMap[arguments[0]]
+
+	if !exists {
+		return "empty list or set", nil
+	}
+
+	num := 1
+	for i, value := range keyValue.value {
+		if i % 2 == 0 {
+			keys += fmt.Sprintf("%v) %v\t", num, value)
+			num++
+		}
+	}
+
+	return keys, nil
+}
+
 // RetrievalFunctions lists all the functions this cache would support for retrieving values
 var RetrievalFunctions = map[string]func(commandKey string, arguments []string, cacheMap map[string]*KeyValue) (string, error){
 	"GET":     retrieveGetFunction,
-	"HGET":    retrieveGetFunction,
-	"HKEYS":   retrieveGetFunction,
+	"HGET":    retrieveHGetFunction,
+	"HKEYS":   retrieveHKeysFunction,
 	"LPOP":    retrieveGetFunction,
 	"LINDEX":  retrieveGetFunction,
 	"GETSET":  retrieveGetFunction,

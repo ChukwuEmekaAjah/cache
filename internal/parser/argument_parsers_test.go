@@ -36,6 +36,23 @@ func TestGetCommandParser(t *testing.T) {
 	}
 }
 
+func TestGetCommandParserWithWhiteSpacedValues(t *testing.T) {
+	setCommand, getCommand := "set ajah 'my boss'", "get ajah"
+	setCommandParts, getCommandParts := strings.Fields(setCommand), strings.Fields(getCommand)
+
+	parsedSetValue := ParserFunctions[strings.ToUpper(setCommandParts[0])](strings.ToUpper(setCommandParts[0]), setCommandParts[1:], cacheMap)
+	cacheMap[setCommandParts[1]] = parsedSetValue
+	
+	parsedValue, err := RetrievalFunctions[strings.ToUpper(getCommandParts[0])](getCommandParts[0], getCommandParts[1:], cacheMap)
+	fmt.Printf("value is %v\n", parsedValue)
+
+	if err != nil {
+		t.Log("Invalid arguments parsed into command")
+		t.Fail()
+	}
+
+}
+
 func TestGetCommandParserFailure(t *testing.T) {
 	command := "get age"
 	commandParts := strings.Fields(command)
@@ -73,5 +90,45 @@ func TestKeysCommandParser(t *testing.T) {
 			t.Log("Incorrect keys returned")
 			t.Fail()
 		}
+	}
+}
+
+func TestExistsCommandParser(t *testing.T) {
+	command := []string{"set boss ajah", "set student ade", "set age 32"}
+
+	for _, v := range command {
+		commandParts := strings.Fields(v)
+		parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+		cacheMap[commandParts[1]] = parsedValue
+	}
+
+	comm := "exists boss student age"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return 3 for all 3 keys")
+		t.Fail()
+	}
+}
+
+func TestHKeysCommandParser(t *testing.T) {
+	command := []string{"hset mentor name ajah", "hset mentor age 24"}
+
+	for _, v := range command {
+		commandParts := strings.Fields(v)
+		parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+		cacheMap[commandParts[1]] = parsedValue
+	}
+
+	comm := "hkeys mentor"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return name and age for mentor")
+		t.Fail()
 	}
 }

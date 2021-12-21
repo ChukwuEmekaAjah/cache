@@ -72,6 +72,7 @@ func tcpHandler(c net.Conn) {
 		fmt.Println("command is ", string(netData), isValidCommand)
 		if !isValidCommand {
 			c.Write([]byte("Invalid command sent"))
+			return
 		}
 
 		commandParts := strings.Fields(strings.TrimSpace(netData))

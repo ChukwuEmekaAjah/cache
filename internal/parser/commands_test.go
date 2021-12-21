@@ -51,3 +51,85 @@ func TestSetexCommandInvalidExpiryTime(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetCommandPresence(t *testing.T) {
+	_, commandExists := Commands["GET"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+}
+
+func TestGetCommandValidity(t *testing.T) {
+	command := "get"
+	commandArgs := []string{"fine boy"}
+
+	if !isValidGetCommand(command, commandArgs) {
+		t.Log("Command should have only an argument")
+		t.Fail()
+	}
+}
+
+func TestExistsCommandPresence(t *testing.T) {
+	_, commandExists := Commands["EXISTS"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+}
+
+func TestExistsValidity(t *testing.T) {
+	command := "exists"
+	commandArgs := []string{"ajah"}
+
+	if !isValidExistsCommand(command, commandArgs) {
+		t.Log("Command should have at least an argument")
+		t.Fail()
+	}
+}
+
+func TestHSetCommand(t *testing.T) {
+	_, commandExists := Commands["HSET"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command := "hset"
+	commandArgs := []string{"mentor", "name", "ajah"}
+
+	if !isValidHsetCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'hset' command")
+		t.Fail()
+	}
+}
+
+func TestHGetCommand(t *testing.T) {
+	_, commandExists := Commands["HGET"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command := "hget"
+	commandArgs := []string{"mentor", "name"}
+
+	if !isValidHgetCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'hget' command")
+		t.Fail()
+	}
+}
+
+func TestKKeysCommand(t *testing.T) {
+	command := "hkeys"
+	commandArgs := []string{"mentor"}
+
+	if !isValidHkeysCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'hkeys' command")
+		t.Fail()
+	}
+}
