@@ -95,7 +95,7 @@ func tcpHandler(c net.Conn) {
 			parsedValue, err := retrievalAction(commandParts[0], commandParts[1:], cacheMap)
 
 			if err != nil {
-				c.Write([]byte("Invalid command sent 3"))
+				c.Write([]byte("Invalid command sent 3: " + err.Error()))
 			}
 			fmt.Println("retrieved value", parsedValue)
 			c.Write([]byte(parsedValue))

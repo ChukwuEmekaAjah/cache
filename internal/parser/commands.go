@@ -25,11 +25,7 @@ func isValidSetexCommand(command string, arguments []string) bool {
 }
 
 func isValidSaddCommand(command string, arguments []string) bool {
-	if len(arguments) < 2 {
-		return false
-	}
-
-	return true
+	return len(arguments) >= 2
 }
 
 func isValidSetnxCommand(command string, arguments []string) bool {
@@ -137,59 +133,35 @@ func isValidHgetAllCommand(command string, arguments []string) bool {
 }
 
 func isValidHlenCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) == 1
 }
 
 func isValidHmgetCommand(command string, arguments []string) bool {
-	if len(arguments) < 2 {
-		return false
-	}
-	return true
+	return len(arguments) >= 2
 }
 
 func isValidPingCommand(command string, arguments []string) bool {
-	if len(arguments) != 0 {
-		return false
-	}
-	return true
+	return len(arguments) <= 1
 }
 
 func isValidHexistsCommand(command string, arguments []string) bool {
-	if len(arguments) != 2 {
-		return false
-	}
-	return true
+	return len(arguments) == 2
 }
 
 func isValidLlenCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) == 1
 }
 
 func isValidMgetCommand(command string, arguments []string) bool {
-	if len(arguments) < 1 {
-		return false
-	}
-	return true
+	return len(arguments) >= 1
 }
 
 func isValidStrLenCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) == 1
 }
 
 func isValidZcardCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) == 1
 }
 
 func isValidExistsCommand(command string, arguments []string) bool {
@@ -197,7 +169,7 @@ func isValidExistsCommand(command string, arguments []string) bool {
 }
 
 func isValidKeysCommand(command string, arguments []string) bool {
-	return true
+	return len(arguments) == 1
 }
 
 // Commands lists all the functions this cache would support
@@ -229,4 +201,5 @@ var Commands = map[string]func(commandKey string, arguments []string) bool{
 	"STRLEN":  isValidStrLenCommand,
 	"ZCARD":   isValidZcardCommand,
 	"KEYS":    isValidKeysCommand,
+	"HSTRLEN": isValidStrLenCommand,
 }
