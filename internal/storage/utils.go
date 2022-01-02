@@ -1,15 +1,17 @@
-package parser
+package storage
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"github.com/ChukwuEmekaAjah/cache/internal/parser"
 )
 
 //Read is the top-level function that accepts client commands on the query
-func Read() (map[string]*KeyValue, error) {
+func Read() (map[string]*parser.KeyValue, error) {
 
-	var cacheMap map[string]*KeyValue
+	var cacheMap map[string]*parser.KeyValue
 	currentDir, err := os.Getwd()
 
 	if err != nil {
@@ -32,7 +34,7 @@ func Read() (map[string]*KeyValue, error) {
 }
 
 //Write is the top-level function that accepts client commands on the query
-func Write(cacheMap map[string]*KeyValue) (bool, error) {
+func Write(cacheMap map[string]*parser.KeyValue) (bool, error) {
 	jsonString, err := json.Marshal(cacheMap)
 
 	if err != nil {

@@ -1,13 +1,15 @@
-package parser
+package storage
 
 import (
 	"testing"
+
+	"github.com/ChukwuEmekaAjah/cache/internal/parser"
 )
 
 func TestWrite(t *testing.T) {
-	cache := make(map[string]*KeyValue)
+	cache := make(map[string]*parser.KeyValue)
 
-	newValue := KeyValue{
+	newValue := parser.KeyValue{
 		Key:     "name",
 		Value:   []string{"Chukus"},
 		Command: "set",
