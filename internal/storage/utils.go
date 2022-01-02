@@ -47,6 +47,7 @@ func Write(cacheMap map[string]*parser.KeyValue) (bool, error) {
 		return false, err
 	}
 
+	os.Remove(currentDir + string(os.PathSeparator) + "data.json")
 	err = ioutil.WriteFile(currentDir+string(os.PathSeparator)+"data.json", []byte(jsonString), 0777)
 
 	if err != nil {
