@@ -59,7 +59,7 @@ func parseSaddFunction(command string, arguments []string, cacheMap map[string]*
 
 	keyValueObject, exists := cacheMap[arguments[0]]
 
-	if exists == false {
+	if !exists {
 		keyValueObject = new(KeyValue)
 		keyValueObject.key = arguments[0]
 		keyValueObject.value = arguments[1:]
@@ -68,14 +68,25 @@ func parseSaddFunction(command string, arguments []string, cacheMap map[string]*
 		return keyValueObject
 	}
 
-	for _, newValue := range arguments[1:] {
-		for _, value := range keyValueObject.value {
-			if value == newValue { // value already in the set
-				continue
-			}
-		}
-		keyValueObject.value = append(keyValueObject.value, newValue)
+	set := make(map[string]struct{})
+
+	for i := 0; i < len(keyValueObject.value); i++ {
+		set[keyValueObject.value[i]] = struct{}{}
 	}
+
+	for _, arg := range arguments[1:] {
+		_, ok := set[arg]
+		if !ok {
+			set[arg] = struct{}{}
+		}
+	}
+
+	flat := []string{}
+    for key := range set {
+        flat = append(flat, key)
+    }
+
+	keyValueObject.value = flat
 
 	return keyValueObject
 }
@@ -84,7 +95,7 @@ func parseZaddFunction(command string, arguments []string, cacheMap map[string]*
 
 	keyValueObject, exists := cacheMap[arguments[0]]
 
-	if exists == false {
+	if !exists {
 		keyValueObject = new(KeyValue)
 		keyValueObject.key = arguments[0]
 		keyValueObject.value = arguments[1:]
@@ -184,6 +195,10 @@ func retrieveHGetFunction(commandName string, arguments []string, cacheMap map[s
 		return "", errors.New("unable to find value")
 	}
 
+	if keyValue.command != "HSET" {
+		return "", errors.New("WRONGTYPE Operation against a key holding the wrong kind of value")
+	}
+
 	var ans string
 
 	for i, value := range keyValue.value {
@@ -213,13 +228,20 @@ func retrieveExistsFunction(commandName string, arguments []string, cacheMap map
 }
 
 func retrieveHlenFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
-	value, exists := cacheMap[arguments[0]]
+	noOfFieldsInHash := 0
+	keyValue, exists := cacheMap[arguments[0]]
 
 	if !exists {
-		return "", errors.New("unable to find key")
+		return "0", nil
 	}
 
-	return fmt.Sprint(len(value.value) / 2), nil
+	for i := range keyValue.value {
+		if i % 2 == 0 {
+			noOfFieldsInHash++
+		}
+	}
+
+	return strconv.Itoa(noOfFieldsInHash), nil
 }
 
 func retrieveLlenFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
@@ -235,8 +257,8 @@ func retrieveLlenFunction(commandName string, arguments []string, cacheMap map[s
 func retrieveStrlenFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
 	value, exists := cacheMap[arguments[0]]
 
-	if exists == false {
-		return "", errors.New("Unable to find key")
+	if !exists {
+		return "0", nil
 	}
 
 	return fmt.Sprint(len(value.value[0])), nil
@@ -271,6 +293,43 @@ func retrieveHKeysFunction(commandName string, arguments []string, cacheMap map[
 	return keys, nil
 }
 
+func retrievePingFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	var ans string; var err error
+
+	switch argumentLength := len(arguments); argumentLength {
+		case 0:
+			ans, err = "PONG", nil
+		case 1:
+			ans, err = strings.Join(arguments[0:], " "), nil
+		default:
+			ans, err = "", errors.New("wrong number of arguments for 'ping' command")
+	}
+
+	return ans, err
+}
+
+func retrieveHExistsFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	keyValue, exists := cacheMap[arguments[0]]
+
+	if !exists {
+		return "0", nil
+	}
+
+	exists = false
+	for i := 0; i < len(keyValue.value); i += 2 {
+		if keyValue.value[i] == arguments[1] {
+			exists = true
+			break;
+		}
+	}
+	
+	if exists {
+		return "1", nil
+	} else {
+		return "0", nil
+	}
+}
+
 // RetrievalFunctions lists all the functions this cache would support for retrieving values
 var RetrievalFunctions = map[string]func(commandKey string, arguments []string, cacheMap map[string]*KeyValue) (string, error){
 	"GET":     retrieveGetFunction,
@@ -282,8 +341,8 @@ var RetrievalFunctions = map[string]func(commandKey string, arguments []string, 
 	"HGETALL": retrieveGetFunction,
 	"HLEN":    retrieveHlenFunction,
 	"HMGET":   retrieveGetFunction,
-	"PING":    retrieveGetFunction,
-	"HEXISTS": retrieveGetFunction,
+	"PING":    retrievePingFunction,
+	"HEXISTS": retrieveHExistsFunction,
 	"EXISTS":  retrieveExistsFunction,
 	"LLEN":    retrieveLlenFunction,
 	"MGET":    retrieveGetFunction,

@@ -132,3 +132,62 @@ func TestHKeysCommandParser(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestHLenCommandParser(t *testing.T) {
+	command := []string{"hset mentor name ajah", "hset mentor age 24"}
+
+	for _, v := range command {
+		commandParts := strings.Fields(v)
+		parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+		cacheMap[commandParts[1]] = parsedValue
+	}
+
+	comm := "hlen mentor"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return 2 for mentor")
+		t.Fail()
+	}
+}
+
+func TestSAddCommandParser(t *testing.T) {
+	command := "sadd myset hello1"
+
+	commandParts := strings.Fields(command)
+
+	parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+
+	cacheMap[commandParts[1]] = parsedValue
+
+	if parsedValue == nil {
+		t.Log("Invalid arguments parsed into command")
+		t.Fail()
+	}
+}
+
+func TestStrLenCommandParser(t *testing.T) {
+	comm := "strlen boss"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return 4 for the value of boss 'ajah'")
+		t.Fail()
+	}
+}
+
+func TestHExistsCommandParser(t *testing.T) {
+	comm := "hexists mentor name"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return 1")
+		t.Fail()
+	} 
+}
