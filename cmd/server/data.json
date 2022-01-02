@@ -1,0 +1,1 @@
+{"age":{"Key":"age","Value":["25"],"Command":"SET"},"me":{"Key":"me","Value":["name","chuks"],"Command":"HSET"},"name":{"Key":"name","Value":["ajah"],"Command":"SET"}}

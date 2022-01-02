@@ -10,16 +10,20 @@ import (
 
 	"github.com/ChukwuEmekaAjah/cache"
 	"github.com/ChukwuEmekaAjah/cache/internal/parser"
+	"github.com/ChukwuEmekaAjah/cache/internal/storage"
 )
 
-type insertion struct {
-	key    string
-	values []string
-}
-
 var cacheMap = make(map[string]*parser.KeyValue)
+var err error = nil
 
-// var values = map[string]insertion{}
+func init() {
+	cacheMap, err = storage.Read()
+
+	if err != nil {
+		cacheMap = make(map[string]*parser.KeyValue)
+	}
+
+}
 
 func main() {
 	cache.Config()
@@ -80,7 +84,7 @@ func tcpHandler(c net.Conn) {
 		commandAction, exists := parser.ParserFunctions[strings.ToUpper(commandParts[0])]
 		retrievalAction, ok := parser.RetrievalFunctions[strings.ToUpper(commandParts[0])]
 
-		if exists == false && ok == false {
+		if !exists && !ok {
 			c.Write([]byte("Invalid command sent 2"))
 		}
 
@@ -88,6 +92,8 @@ func tcpHandler(c net.Conn) {
 			parsedValue := commandAction(strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
 
 			cacheMap[commandParts[1]] = parsedValue
+
+			storage.Write(cacheMap)
 		}
 
 		// retrieval function
