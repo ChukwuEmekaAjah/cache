@@ -17,11 +17,7 @@ func isValidSetexCommand(command string, arguments []string) bool {
 
 	_, err := strconv.ParseInt(arguments[1], 10, 64)
 
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 func isValidSaddCommand(command string, arguments []string) bool {
@@ -29,11 +25,7 @@ func isValidSaddCommand(command string, arguments []string) bool {
 }
 
 func isValidSetnxCommand(command string, arguments []string) bool {
-	if len(arguments) < 2 {
-		return false
-	}
-
-	return true
+	return len(arguments) < 2
 }
 
 func isValidZaddCommand(command string, arguments []string) bool {
@@ -60,27 +52,16 @@ func isValidLsetCommand(command string, arguments []string) bool {
 
 	_, err := strconv.ParseInt(arguments[1], 10, 64)
 
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 func isValidLpushCommand(command string, arguments []string) bool {
-	if len(arguments) < 2 {
-		return false
-	}
-
-	return true
+	return len(arguments) < 2
 }
 
 func isValidMsetCommand(command string, arguments []string) bool {
 	// should have an equal number of keys and values
-	if len(arguments)%2 == 1 {
-		return false
-	}
-	return true
+	return len(arguments)%2 == 1
 }
 
 func isValidHMSetCommand(command string, arguments []string) bool {
@@ -105,31 +86,19 @@ func isValidHkeysCommand(command string, arguments []string) bool {
 }
 
 func isValidLpopCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) != 1
 }
 
 func isValidLindexCommand(command string, arguments []string) bool {
-	if len(arguments) != 2 {
-		return false
-	}
-	return true
+	return len(arguments) != 2
 }
 
 func isValidGetSetCommand(command string, arguments []string) bool {
-	if len(arguments) != 2 {
-		return false
-	}
-	return true
+	return len(arguments) != 2
 }
 
 func isValidHgetAllCommand(command string, arguments []string) bool {
-	if len(arguments) != 1 {
-		return false
-	}
-	return true
+	return len(arguments) != 1
 }
 
 func isValidHlenCommand(command string, arguments []string) bool {

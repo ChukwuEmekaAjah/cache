@@ -8,15 +8,11 @@ func Parse(command string) bool {
 	commandKey := commandParts[0]
 	commandParsingFunction, commandExists := Commands[strings.ToUpper(commandKey)]
 
-	if commandExists == false {
+	if !commandExists {
 		return false
 	}
 
 	isValidRequest := commandParsingFunction(commandKey, commandParts[1:])
 
-	if !isValidRequest {
-		return false
-	}
-
-	return true
+	return isValidRequest
 }
