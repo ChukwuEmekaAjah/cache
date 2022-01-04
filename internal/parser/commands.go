@@ -56,7 +56,7 @@ func isValidLsetCommand(command string, arguments []string) bool {
 }
 
 func isValidLpushCommand(command string, arguments []string) bool {
-	return len(arguments) < 2
+	return len(arguments) >= 2
 }
 
 func isValidMsetCommand(command string, arguments []string) bool {
@@ -86,11 +86,28 @@ func isValidHkeysCommand(command string, arguments []string) bool {
 }
 
 func isValidLpopCommand(command string, arguments []string) bool {
-	return len(arguments) != 1
+	var err error
+	isArgumentsValid := len(arguments) == 1 || len(arguments) == 2
+	
+	if !isArgumentsValid {
+		return false
+	}
+
+	if len(arguments) == 2 {
+		_, err = strconv.ParseInt(arguments[1], 10, 64);
+	}
+	
+	return err == nil
 }
 
 func isValidLindexCommand(command string, arguments []string) bool {
-	return len(arguments) != 2
+	if len(arguments) != 2 {
+		return false
+	}
+
+	_, err := strconv.ParseInt(arguments[1], 10, 64)
+
+	return err == nil
 }
 
 func isValidGetSetCommand(command string, arguments []string) bool {

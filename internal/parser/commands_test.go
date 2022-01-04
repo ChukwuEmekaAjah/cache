@@ -200,3 +200,83 @@ func TestHExistsCommand(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestLSetCommand(t *testing.T) {
+	_, commandExists := Commands["LSET"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command, commandArgs := "lset", []string{"mylist", "0", "one"}
+	
+	if !isValidLsetCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'lset' command")
+		t.Fail()
+	}
+}
+
+func TestLPopCommand(t *testing.T) {
+	_, commandExists := Commands["LPOP"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command, commandArgs := "lpop", []string{"mylist"}
+	
+	if !isValidLpopCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'lpop' command")
+		t.Fail()
+	}
+}
+
+func TestLPushCommand(t *testing.T) {
+	_, commandExists := Commands["LPUSH"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command, commandArgs := "lpush", []string{"mylist", "one", "two", "three"}
+	
+	if !isValidLpushCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'lpush' command")
+		t.Fail()
+	}
+}
+
+func TestLlenCommand(t *testing.T) {	
+	_, commandExists := Commands["LLEN"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command, commandArgs := "llen", []string{"mylist"}
+	
+	if !isValidLlenCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'llen' command")
+		t.Fail()
+	}
+}
+
+func TestLindexCommand(t *testing.T) {
+	_, commandExists := Commands["LINDEX"]
+
+	if !commandExists {
+		t.Log("Command does not exist")
+		t.Fail()
+	}
+
+	command, commandArgs := "lindex", []string{"mylist", "1"}
+	
+	if !isValidLindexCommand(command, commandArgs) {
+		t.Log("Wrong number of arguments for 'lindex' command")
+		t.Fail()
+	}
+}
