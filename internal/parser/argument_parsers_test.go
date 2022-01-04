@@ -191,3 +191,42 @@ func TestHExistsCommandParser(t *testing.T) {
 		t.Fail()
 	} 
 }
+
+func TestLPushCommandParser(t *testing.T) {
+	command := "lpush mylist hello"
+
+	commandParts := strings.Fields(command)
+
+	parsedValue := ParserFunctions[strings.ToUpper(commandParts[0])](strings.ToUpper(commandParts[0]), commandParts[1:], cacheMap)
+
+	cacheMap[commandParts[1]] = parsedValue
+
+	if parsedValue == nil {
+		t.Log("Invalid arguments parsed into command")
+		t.Fail()
+	}
+}
+
+func TestLPopCommandParser(t *testing.T) {
+	comm := "llen mylist"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return 1")
+		t.Fail()
+	} 
+}
+
+func TestLindexCommandParser(t *testing.T) {
+	comm := "lindex mylist 0"
+	commandParts := strings.Fields(comm)
+
+	_, err := RetrievalFunctions[strings.ToUpper(commandParts[0])](commandParts[0], commandParts[1:], cacheMap)
+
+	if err != nil {
+		t.Log("Command should return hello")
+		t.Fail()
+	} 
+}

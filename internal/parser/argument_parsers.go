@@ -331,13 +331,63 @@ func retrieveHExistsFunction(commandName string, arguments []string, cacheMap ma
 	}
 }
 
+
+func retrieveLPopFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	keyValue, exists := cacheMap[arguments[0]]
+	var index int64 = 1
+
+	var err error
+
+	if !exists {
+		return "(nil)", nil
+	}
+
+	if len(arguments) == 2 {
+		index, err = strconv.ParseInt(arguments[1], 10, 64)
+		if err != nil {
+			return "", errors.New("error parsing")
+		}
+	}
+
+	ans := ""
+	num := 1
+	for _, v := range keyValue.Value[:index] {
+		ans += fmt.Sprintf("%v) %v\t", v, num)
+		num++
+	}
+
+	keyValue.Value = keyValue.Value[index:]
+
+	return ans, nil
+}
+
+func retrieveLindexFunction(commandName string, arguments []string, cacheMap map[string]*KeyValue) (string, error) {
+	keyValue, exists := cacheMap[arguments[0]]
+
+	if !exists {
+		return "(nil)", nil
+	}
+
+	index, err := strconv.ParseInt(arguments[1], 10, 64)
+	if err != nil {
+		return "", errors.New("error parsing")
+	}
+
+	// for -ve indexes
+	if index < 0 {
+		index = int64(len(keyValue.Value)) - (index * -1)
+	}
+
+	return keyValue.Value[index], nil
+}
+
 // RetrievalFunctions lists all the functions this cache would support for retrieving values
 var RetrievalFunctions = map[string]func(commandKey string, arguments []string, cacheMap map[string]*KeyValue) (string, error){
 	"GET":     retrieveGetFunction,
 	"HGET":    retrieveHGetFunction,
 	"HKEYS":   retrieveHKeysFunction,
-	"LPOP":    retrieveGetFunction,
-	"LINDEX":  retrieveGetFunction,
+	"LPOP":    retrieveLPopFunction,
+	"LINDEX":  retrieveLindexFunction,
 	"GETSET":  retrieveGetFunction,
 	"HGETALL": retrieveGetFunction,
 	"HLEN":    retrieveHlenFunction,
